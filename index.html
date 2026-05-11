@@ -6202,7 +6202,75 @@ function App() {
   );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+const SENHA = 'guia567';
+
+function Gate({ onUnlock }) {
+  const [val, setVal] = React.useState('');
+  const [erro, setErro] = React.useState(false);
+  const tentar = () => {
+    if (val.trim() === SENHA) { onUnlock(); }
+    else { setErro(true); setVal(''); setTimeout(() => setErro(false), 2000); }
+  };
+  return (
+    <div style={{
+      position:'fixed',inset:0,background:'#0C0C0E',
+      display:'flex',alignItems:'center',justifyContent:'center',
+      flexDirection:'column',fontFamily:"'Sora',sans-serif",zIndex:9999,padding:24
+    }}>
+      <div style={{fontFamily:"'DM Serif Display',serif",fontSize:32,color:'#fff',marginBottom:6}}>
+        Job<em style={{color:'#C9B99A',fontStyle:'italic'}}>Core</em>
+      </div>
+      <div style={{fontSize:11,letterSpacing:3,textTransform:'uppercase',color:'#9A8A72',marginBottom:48}}>
+        Guia Inteligente de Cargos
+      </div>
+      <div style={{
+        background:'rgba(255,255,255,.04)',border:'1px solid rgba(201,185,154,.2)',
+        borderRadius:16,padding:'40px 48px',width:'100%',maxWidth:360,textAlign:'center'
+      }}>
+        <div style={{fontSize:16,fontWeight:700,color:'#fff',marginBottom:6}}>Acesso restrito</div>
+        <div style={{fontSize:13,color:'#9A9490',marginBottom:28,lineHeight:1.6}}>
+          Digite a senha recebida no e-mail após a compra.
+        </div>
+        <input
+          type="password"
+          value={val}
+          onChange={e => setVal(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && tentar()}
+          placeholder="••••••••"
+          style={{
+            width:'100%',padding:'14px 18px',
+            background:'rgba(255,255,255,.07)',
+            border:`1px solid ${erro ? '#E8622A' : 'rgba(201,185,154,.25)'}`,
+            borderRadius:10,color:'#fff',fontSize:15,
+            fontFamily:"'Sora',sans-serif",outline:'none',
+            textAlign:'center',letterSpacing:3,marginBottom:14,
+            transition:'border-color .2s'
+          }}
+          autoFocus
+        />
+        <button
+          onClick={tentar}
+          style={{
+            width:'100%',padding:15,background:'#E8622A',border:'none',
+            borderRadius:10,color:'#fff',fontSize:14,fontWeight:700,
+            fontFamily:"'Sora',sans-serif",cursor:'pointer'
+          }}
+        >Acessar</button>
+        {erro && <div style={{color:'#E8622A',fontSize:12,marginTop:12}}>Senha incorreta. Tente novamente.</div>}
+      </div>
+    </div>
+  );
+}
+
+function Root() {
+  const [unlocked, setUnlocked] = React.useState(
+    () => sessionStorage.getItem('jc_auth') === '1'
+  );
+  const unlock = () => { sessionStorage.setItem('jc_auth','1'); setUnlocked(true); };
+  return unlocked ? <App /> : <Gate onUnlock={unlock} />;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<Root />);
 
   </script>
 </body>
